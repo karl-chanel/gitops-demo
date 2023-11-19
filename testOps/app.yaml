@@ -1,0 +1,38 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: myapp
+  namespace: default
+spec:
+  workflow:
+    steps:
+      - name: deploy2default
+        type: deploy
+        properties:
+          policies: ["target-default"]
+  policies:
+  - name: target-default
+    type: topology
+    properties:
+      clusters: ["local"]
+      namespace: "default"
+  components:
+    - name: myapp
+      type: webservice
+      properties:
+        image: mikevivi/simpleserver:v1
+        ports:
+         - port: 8000
+           expose: true
+      traits:
+        - type: scaler
+          properties:
+            replicas: 2
+        - type: gateway
+          properties:
+            domain: konako.cn
+            http:
+              "/": 8000
+            class: apisix
+              
+               
